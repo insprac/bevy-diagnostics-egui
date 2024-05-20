@@ -13,24 +13,24 @@ impl Plugin for DiagnosticsEguiPlugin {
 fn draw_diagnostic_ui(diagnostics: Res<DiagnosticsStore>, mut contexts: EguiContexts) {
     egui::Window::new("Diagnostics").show(contexts.ctx_mut(), |ui| {
         for diagnostic in diagnostics.iter() {
-            if let Some(value) = get_diagnostic_value(diagnostic) {
-                ui.label(format!(
-                    "{}: {}{}",
-                    diagnostic.path(),
-                    format_value(value),
-                    diagnostic.suffix,
-                ));
-            }
+            let Some(value) = get_diagnostic_value(diagnostic) else {
+                continue;
+            };
+            ui.label(format!(
+                "{}: {}{}",
+                diagnostic.path(),
+                format_value(value),
+                diagnostic.suffix,
+            ));
         }
     });
 }
 
 fn get_diagnostic_value(diagnostic: &Diagnostic) -> Option<f64> {
-    if diagnostic.is_enabled {
-        diagnostic.smoothed()
-    } else {
-        None
+    if !diagnostic.is_enabled {
+        return None;
     }
+    diagnostic.smoothed()
 }
 
 fn format_value(value: f64) -> String {
