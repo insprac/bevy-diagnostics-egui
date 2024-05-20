@@ -1,0 +1,10 @@
+[package]
+name = "simple-default-diagnostics"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.13.2"
+bevy_diagnostics_egui = { version = "*", path = "../.." }
+bevy_egui = "0.27.0"
+egui = "0.27.2"
