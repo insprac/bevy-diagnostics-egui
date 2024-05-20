@@ -1,14 +1,30 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use bevy::diagnostic::DiagnosticsStore;
+use bevy::prelude::*;
+use bevy_egui::EguiContexts;
+
+pub struct DiagnosticsEguiPlugin;
+
+impl Plugin for DiagnosticsEguiPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, draw_diagnostic_ui);
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+fn draw_diagnostic_ui(diagnostics: Res<DiagnosticsStore>, mut contexts: EguiContexts) {
+    egui::Window::new("Diagnostics").show(contexts.ctx_mut(), |ui| {
+        for diagnostic in diagnostics.iter() {
+            if !diagnostic.is_enabled {
+                continue;
+            }
+            let Some(value) = diagnostic.smoothed() else {
+                continue;
+            };
+            ui.label(format!(
+                "{}: {:.2}{}",
+                diagnostic.path(),
+                value,
+                diagnostic.suffix,
+            ));
+        }
+    });
 }
